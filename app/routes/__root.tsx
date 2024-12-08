@@ -1,17 +1,15 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, Outlet, useRouterState } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/start";
+import { createServerFn, Scripts, Meta } from "@tanstack/start";
 import { FC } from "react";
 import { getCookie } from "vinxi/http";
 
 const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
   // We need to auth on the server so we have access to secure cookies
-  const user = getCookie("user");
-
-  console.log({ userCookie: user });
+  const result = getCookie("user");
 
   return {
-    user,
+    user: result,
   };
 });
 
@@ -70,11 +68,18 @@ function Root() {
   const isNavigating = state.isLoading;
 
   return (
-    <>
-      <div className="p-x-2">
-        <Loading shown={isNavigating} />
-        <Outlet />
-      </div>
-    </>
+    <html>
+      <head>
+        <Meta />
+      </head>
+
+      <body>
+        <div className="p-x-2">
+          <Loading shown={isNavigating} />
+          <Outlet />
+          <Scripts />
+        </div>
+      </body>
+    </html>
   );
 }
