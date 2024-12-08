@@ -1,9 +1,9 @@
-import { Fragment, use } from "react";
+import { Fragment, Suspense, use } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { getTasksList } from "../../serverFnQueries/tasks";
 
 export const Route = createFileRoute("/app/tasks/")({
-  component: Index,
+  component: IndexWrapper,
   loader: async ({ context }) => {
     const now = +new Date();
     console.log(`/tasks/index path loader. Loading tasks at + ${now - context.timestarted}ms since start`);
@@ -17,6 +17,13 @@ export const Route = createFileRoute("/app/tasks/")({
   pendingMinMs: 200,
 });
 
+function IndexWrapper() {
+  return (
+    <Suspense fallback={<span>Loading ...</span>}>
+      <Index />
+    </Suspense>
+  );
+}
 function Index() {
   const { tasks: tasksPromise } = Route.useLoaderData();
   const matchData = Route.useMatch();
