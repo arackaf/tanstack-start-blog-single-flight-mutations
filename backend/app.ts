@@ -5,7 +5,7 @@ import cors from "cors";
 import bodyParser, { json } from "body-parser";
 import { setup } from "./db-setup";
 import { command, query } from "./db-utils";
-import { Task } from "../src/types";
+import { Task } from "../types";
 
 const jsonParser = bodyParser.json();
 

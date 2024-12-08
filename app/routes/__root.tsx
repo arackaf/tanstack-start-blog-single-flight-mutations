@@ -1,15 +1,10 @@
 import { QueryClient } from "@tanstack/react-query";
-import {
-  createRootRouteWithContext,
-  Outlet,
-  useRouterState,
-} from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet, useRouterState } from "@tanstack/react-router";
 import { FC } from "react";
 
-const Loading: FC<{ shown: boolean }> = (props) => {
+const Loading: FC<{ shown: boolean }> = props => {
   const { shown } = props;
-  const corePosition =
-    "fixed left-[50%] top-0 translate-x-[-50%] bg-yellow-300";
+  const corePosition = "fixed left-[50%] top-0 translate-x-[-50%] bg-yellow-300";
   return (
     <div
       style={{
@@ -32,9 +27,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     const timeStarted = +new Date();
     console.log("");
     console.log("Fresh navigation to", location.href);
-    console.log(
-      "------------------------------------------------------------------------------------",
-    );
+    console.log("------------------------------------------------------------------------------------");
 
     return { timestarted: timeStarted };
   },
