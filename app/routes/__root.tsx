@@ -1,6 +1,19 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, Outlet, useRouterState } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/start";
 import { FC } from "react";
+import { getCookie } from "vinxi/http";
+
+const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
+  // We need to auth on the server so we have access to secure cookies
+  const user = getCookie("user");
+
+  console.log({ userCookie: user });
+
+  return {
+    user,
+  };
+});
 
 const Loading: FC<{ shown: boolean }> = props => {
   const { shown } = props;
@@ -23,6 +36,11 @@ type MyRouterContext = {
 };
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  async beforeLoad() {
+    const user = await fetchUser();
+    console.log("AAA", { user });
+    return { user };
+  },
   context({ location }) {
     const timeStarted = +new Date();
     console.log("");

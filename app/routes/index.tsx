@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  beforeLoad({}) {
-    if (document.cookie.includes("user=1")) {
+  async beforeLoad({ context }) {
+    if (context.user) {
       throw redirect({ to: "/app" });
     }
   },
