@@ -1,14 +1,13 @@
 import { Fragment } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { fetchJson } from "../../../backend/fetchUtils";
-import { Task } from "../../../types";
+import { getTasksList } from "../../serverFnQueries/tasks";
 
 export const Route = createFileRoute("/app/tasks/")({
   component: Index,
   loader: async ({ context }) => {
     const now = +new Date();
     console.log(`/tasks/index path loader. Loading tasks at + ${now - context.timestarted}ms since start`);
-    const tasks = await fetchJson<Task[]>("api/tasks");
+    const tasks = await getTasksList();
     return { tasks };
   },
   gcTime: 1000 * 60 * 5,
