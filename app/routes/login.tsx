@@ -4,7 +4,7 @@ export const Route = createFileRoute("/login")({
   component: () => {
     function login() {
       const age = 60 * 60 * 24 * 30;
-      document.cookie = `loggedout=;path=/;max-age=${age}`;
+      document.cookie = `user=1;path=/;max-age=${age}`;
       throw redirect({ to: "/app" });
     }
     return (

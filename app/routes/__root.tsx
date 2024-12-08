@@ -37,9 +37,8 @@ type MyRouterContext = {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   async beforeLoad() {
-    const user = await fetchUser();
-    console.log("AAA", { user });
-    return { user };
+    const result = await fetchUser();
+    return { user: result.user };
   },
   context({ location }) {
     const timeStarted = +new Date();
