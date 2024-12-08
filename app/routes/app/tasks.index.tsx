@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, use } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { getTasksList } from "../../serverFnQueries/tasks";
 
@@ -7,7 +7,7 @@ export const Route = createFileRoute("/app/tasks/")({
   loader: async ({ context }) => {
     const now = +new Date();
     console.log(`/tasks/index path loader. Loading tasks at + ${now - context.timestarted}ms since start`);
-    const tasks = await getTasksList();
+    const tasks = getTasksList();
     return { tasks };
   },
   gcTime: 1000 * 60 * 5,
@@ -18,9 +18,10 @@ export const Route = createFileRoute("/app/tasks/")({
 });
 
 function Index() {
-  const { tasks } = Route.useLoaderData();
+  const { tasks: tasksPromise } = Route.useLoaderData();
   const matchData = Route.useMatch();
 
+  const tasks = use(tasksPromise);
   const { isFetching } = matchData;
 
   return (
