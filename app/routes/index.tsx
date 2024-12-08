@@ -12,7 +12,7 @@ export const serverFn1 = createServerFn({ method: "GET" })
 
 export const serverFn2 = createServerFn({ method: "GET" })
   .validator((x: string) => {
-    return 12 as any;
+    return 12 as const;
   })
   .handler((ctx) => {
     const x = ctx.data; // x is any
