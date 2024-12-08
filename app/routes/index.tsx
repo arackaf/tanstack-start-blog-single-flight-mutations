@@ -1,17 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  component: Home,
-  async loader() {
-    return {};
+  beforeLoad({}) {
+    if (document.cookie.includes("user=1")) {
+      throw redirect({ to: "/app" });
+    }
   },
+  component: Index,
 });
 
-function Home() {
+function Index() {
   return (
-    <div>
-      <Link to="/foo">Foo</Link>
-      <div>Hello</div>
+    <div className="m-3">
+      <h2 className="text-2xl">Public Homepage</h2>
     </div>
   );
 }
