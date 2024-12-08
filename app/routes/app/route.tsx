@@ -1,17 +1,12 @@
 import { createFileRoute, Link, Outlet, redirect, useRouter } from "@tanstack/react-router";
-import { getCurrentUser } from "../../../backend/auth";
 
 export const Route = createFileRoute("/app")({
-  async beforeLoad({}) {
-    const user = await getCurrentUser();
-    if (!user) {
+  async beforeLoad({ context }) {
+    if (!context.user) {
       throw redirect({
         to: "/login",
       });
     }
-    //document.cookie = `user=${user.id};path=/;max-age=31536000`;
-
-    return { user };
   },
   pendingMs: 200,
   pendingMinMs: 0,
