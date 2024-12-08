@@ -4,7 +4,7 @@ import { createServerFn, Scripts, Meta } from "@tanstack/start";
 import { FC } from "react";
 import { getCookie } from "vinxi/http";
 
-import "../styles/globals.css";
+import appCss from "../styles/globals.css?url";
 
 const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
   // We need to auth on the server so we have access to secure cookies
@@ -61,6 +61,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         title: "TanStack Start Starter",
       },
     ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   component: Root,
 });
