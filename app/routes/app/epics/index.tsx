@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { epicsCountQueryOptions, epicsQueryOptions } from "../../../app/queries/epicsQuery";
+import { epicsCountQueryOptions, epicsQueryOptions } from "../../../queries/epicsQuery";
 import { Fragment } from "react/jsx-runtime";
 import { useDeferredValue, useState } from "react";
 

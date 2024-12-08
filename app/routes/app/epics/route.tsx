@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { epicsSummaryQueryOptions } from "../../../app/queries/epicsSummaryQuery";
+import { epicsSummaryQueryOptions } from "../../../queries/epicsSummaryQuery";
 import { Fragment } from "react/jsx-runtime";
 
 export const Route = createFileRoute("/app/epics")({

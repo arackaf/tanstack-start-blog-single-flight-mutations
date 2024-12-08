@@ -1,4 +1,4 @@
-import { fetchJson } from "../../../backend/fetchUtils";
+import { fetchJson } from "../../backend/fetchUtils";
 
 export type EpicOverview = {
   name: string;

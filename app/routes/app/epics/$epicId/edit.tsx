@@ -1,6 +1,6 @@
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { epicQueryOptions } from "../../../../app/queries/epicQuery";
+import { epicQueryOptions } from "../../../../queries/epicQuery";
 import { useEffect, useRef, useState } from "react";
 import { postToApi } from "../../../../../backend/fetchUtils";
 

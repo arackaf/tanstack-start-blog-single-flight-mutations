@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { fetchJson, postToApi } from "../../../backend/fetchUtils";
-import { Task } from "../../types";
+import { Task } from "../../../types";
 import { useEffect, useRef } from "react";
 
 export const Route = createFileRoute("/app/tasks_/$taskId/edit")({

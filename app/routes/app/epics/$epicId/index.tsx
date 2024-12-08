@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { epicQueryOptions } from "../../../../app/queries/epicQuery";
+import { epicQueryOptions } from "../../../../queries/epicQuery";
 
 export const Route = createFileRoute("/app/epics/$epicId/")({
   component: EpicIndex,
