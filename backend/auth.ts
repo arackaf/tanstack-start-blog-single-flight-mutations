@@ -13,8 +13,8 @@ export async function getCurrentUser() {
     userPacket.user = FAKE_USER;
   }
 
-  if (document.cookie.includes("loggedout=1")) {
-    return null;
-  }
+  // if (document.cookie.includes("loggedout=1")) {
+  //   return null;
+  // }
   return userPacket.user as typeof FAKE_USER;
 }

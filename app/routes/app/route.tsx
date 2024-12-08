@@ -9,7 +9,7 @@ export const Route = createFileRoute("/app")({
         to: "/login",
       });
     }
-    document.cookie = `user=${user.id};path=/;max-age=31536000`;
+    //document.cookie = `user=${user.id};path=/;max-age=31536000`;
 
     return { user };
   },
