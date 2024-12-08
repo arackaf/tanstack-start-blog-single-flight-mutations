@@ -1,23 +1,36 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/start";
+
+export const serverFn1 = createServerFn({ method: "GET" })
+  .validator((x: string) => {
+    return 12;
+  })
+  .handler((ctx) => {
+    const x = ctx.data; // x is any
+    return { time: "" };
+  });
+
+export const serverFn2 = createServerFn({ method: "GET" })
+  .validator((x: string) => {
+    return 12 as any;
+  })
+  .handler((ctx) => {
+    const x = ctx.data; // x is any
+    return { time: "" };
+  });
 
 export const Route = createFileRoute("/")({
   component: Home,
   async loader() {
-    console.log("Root loader");
-    await new Promise((res) => setTimeout(res, 500));
-
-    return {
-      x: new Date(),
-    };
+    return {};
   },
 });
 
 function Home() {
-  const { x } = Route.useLoaderData();
   return (
     <div>
       <Link to="/foo">Foo</Link>
-      <div>Hello {x.toString()}</div>
+      <div>Hello</div>
     </div>
   );
 }
