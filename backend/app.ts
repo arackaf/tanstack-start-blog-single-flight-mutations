@@ -29,7 +29,7 @@ app.get("/api/tasks/overview", function (req, res) {
     ON t.userId = u.id
     GROUP BY u.id
   `)
-    .then(tasks => new Promise(res => setTimeout(() => res(tasks), 750)))
+    //.then(tasks => new Promise(res => setTimeout(() => res(tasks), 750)))
     .then(tasks => {
       res.json(tasks);
     });
