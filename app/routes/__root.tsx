@@ -33,10 +33,15 @@ const Loading: FC<{ shown: boolean }> = props => {
 
 type MyRouterContext = {
   queryClient: QueryClient;
+  user: string;
 };
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  async beforeLoad() {
+  async beforeLoad({ context }) {
+    if (context.user) {
+      return { user: context.user };
+    }
+
     const result = await fetchUser();
     return { user: result.user };
   },
