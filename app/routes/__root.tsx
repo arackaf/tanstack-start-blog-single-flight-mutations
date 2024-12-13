@@ -10,8 +10,11 @@ const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
   // We need to auth on the server so we have access to secure cookies
   const result = getCookie("user");
 
+  if (!result) {
+    return null;
+  }
   return {
-    user: result,
+    user: { id: result, name: result ? "Adam" : undefined },
   };
 });
 
@@ -33,7 +36,7 @@ const Loading: FC<{ shown: boolean }> = props => {
 
 type MyRouterContext = {
   queryClient: QueryClient;
-  user: string;
+  user: { id: string; name: string } | null;
 };
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -43,7 +46,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     }
 
     const result = await fetchUser();
-    return { user: result.user };
+    return result;
   },
   context({ location }) {
     const timeStarted = +new Date();
