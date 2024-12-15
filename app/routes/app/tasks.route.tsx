@@ -15,14 +15,13 @@ export const Route = createFileRoute("/app/tasks")({
     const tasksOverview = await fetchJson<TaskOverview[]>("api/tasks/overview");
     return { tasksOverview };
   },
+  errorComponent: () => <h1>Yooo</h1>,
   gcTime: 1000 * 60 * 5,
   staleTime: 1000 * 60 * 2,
 });
 
 function TasksLayout() {
   const { tasksOverview } = Route.useLoaderData();
-
-  const { isFetching } = Route.useMatch();
 
   return (
     <div className="flex flex-col gap-3">
