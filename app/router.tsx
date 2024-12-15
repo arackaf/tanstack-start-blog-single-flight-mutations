@@ -9,7 +9,7 @@ export function createRouter() {
 
   const router = routerWithQueryClient(
     createTanStackRouter({
-      context: { user: null, queryClient },
+      context: { user: { id: "1", name: "Adam" }, queryClient },
       routeTree,
     }),
     queryClient,
