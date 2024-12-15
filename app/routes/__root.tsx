@@ -37,6 +37,7 @@ const Loading: FC<{ shown: boolean }> = props => {
 type MyRouterContext = {
   queryClient: QueryClient;
   user: { id: string; name: string } | null;
+  timestarted: number;
 };
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
