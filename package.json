@@ -16,6 +16,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.62.3",
     "@tanstack/react-router": "^1.87.0",
+    "@tanstack/react-router-with-query": "^1.90.0",
     "@tanstack/start": "^1.86.1",
     "autoprefixer": "^10.4.20",
     "body-parser": "^1.20.3",
