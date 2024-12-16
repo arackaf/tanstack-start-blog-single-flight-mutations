@@ -1,8 +1,22 @@
+import { useServerFn } from "@tanstack/start";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { epicQueryOptions } from "../../../../queries/epicQuery";
 import { useEffect, useRef, useState } from "react";
 import { postToApi } from "../../../../../backend/fetchUtils";
+import { createServerFn } from "@tanstack/start";
+
+export const saveEpic = createServerFn({ method: "POST" })
+  .validator((updates: { id: string; newName: string }) => updates)
+  .handler(async ({ data }) => {
+    await postToApi("api/epic/update", {
+      id: data.id,
+      name: data.newName,
+    });
+
+    throw redirect({ to: "/app/epics", search: { page: 1 } });
+  });
 
 export const Route = createFileRoute("/app/epics/$epicId/edit")({
   component: EditEpic,
@@ -19,7 +33,6 @@ export const Route = createFileRoute("/app/epics/$epicId/edit")({
 function EditEpic() {
   const { epicId } = Route.useParams();
   const { currentEpicOptions } = Route.useRouteContext();
-  const navigate = useNavigate({ from: "/app/epics/$epicId/edit" });
   const { data: epic } = useSuspenseQuery(currentEpicOptions);
   const newName = useRef<HTMLInputElement>(null);
 
@@ -27,19 +40,20 @@ function EditEpic() {
 
   const queryClient = useQueryClient();
 
+  const runSave = useServerFn(saveEpic);
+
   const save = async () => {
     setSaving(true);
-    await postToApi("api/epic/update", {
-      id: epic.id,
-      name: newName.current!.value,
+
+    await runSave({
+      data: {
+        id: epic.id,
+        newName: newName.current!.value,
+      },
     });
 
-    queryClient.removeQueries({ queryKey: ["epics"] });
-    queryClient.removeQueries({ queryKey: ["epic", epicId] });
-
-    navigate({ to: "/app/epics", search: { page: 1 } });
-
-    setSaving(false);
+    queryClient.invalidateQueries({ queryKey: ["epics"] });
+    queryClient.invalidateQueries({ queryKey: ["epic", epicId] });
   };
 
   useEffect(() => {
