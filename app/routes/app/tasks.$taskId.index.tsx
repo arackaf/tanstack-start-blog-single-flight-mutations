@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchJson } from "../../../backend/fetchUtils";
 import { Task } from "../../../types";
+import { getTask } from "../../serverFnQueries/tasks";
+import { use } from "react";
 
 export const Route = createFileRoute("/app/tasks/$taskId/")({
   loader: async ({ params, context }) => {
@@ -11,7 +13,7 @@ export const Route = createFileRoute("/app/tasks/$taskId/")({
     }
     const now = +new Date();
     console.log(`/tasks/${taskId} path loader. Loading at + ${now - context.timestarted}ms since start`);
-    const task = await fetchJson<Task>(`api/tasks/${taskId}`);
+    const task = getTask({ data: taskId });
 
     return { task };
   },
@@ -25,8 +27,10 @@ export const Route = createFileRoute("/app/tasks/$taskId/")({
 });
 
 function TaskView() {
-  const { task } = Route.useLoaderData();
+  const { task: taskPromise } = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
+
+  const task = use(taskPromise);
 
   return (
     <div className="flex flex-col gap-4 p-3">

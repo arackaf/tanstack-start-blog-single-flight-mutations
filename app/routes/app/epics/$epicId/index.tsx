@@ -5,7 +5,11 @@ import { epicQueryOptions } from "../../../../queries/epicQuery";
 export const Route = createFileRoute("/app/epics/$epicId/")({
   component: EpicIndex,
   context: ({ params }) => {},
+  loader: ({ context, params }) => {
+    const { queryClient, timestarted } = context;
 
+    queryClient.ensureQueryData(epicQueryOptions(timestarted, params.epicId));
+  },
   gcTime: 1000 * 60 * 5,
   staleTime: 1000 * 60 * 5,
   pendingComponent: () => <div className="m-4 p-4 text-xl">Loading epic ...</div>,

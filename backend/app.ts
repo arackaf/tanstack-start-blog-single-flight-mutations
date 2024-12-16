@@ -28,11 +28,9 @@ app.get("/api/tasks/overview", function (req, res) {
     INNER JOIN users u
     ON t.userId = u.id
     GROUP BY u.id
-  `)
-    //.then(tasks => new Promise(res => setTimeout(() => res(tasks), 750)))
-    .then(tasks => {
-      res.json(tasks);
-    });
+  `).then(tasks => {
+    res.json(tasks);
+  });
 });
 
 app.get("/api/tasks", async function (req, res) {
@@ -44,11 +42,9 @@ app.get("/api/tasks", async function (req, res) {
     WHERE userId = ?
   `,
     [userId],
-  )
-    .then(tasks => new Promise(res => setTimeout(() => res(tasks), 750)))
-    .then(tasks => {
-      res.json(tasks);
-    });
+  ).then(tasks => {
+    res.json(tasks);
+  });
 });
 
 app.get("/api/tasks/:id", async function (req, res) {
@@ -97,28 +93,22 @@ app.get("/api/epics/overview", async function (req, res) {
       ORDER BY count ASC
   `,
     [],
-  )
-    .then(result => new Promise(res => setTimeout(() => res(result), 750)))
-    .then((result: any) => {
-      res.json(result);
-    });
+  ).then((result: any) => {
+    res.json(result);
+  });
 });
 
 app.get("/api/epics", function (req, res) {
   const page = parseInt(req.query.page as string);
-  query("SELECT * FROM epics LIMIT ?, 4", [(page - 1) * 4])
-    .then(result => new Promise(res => setTimeout(() => res(result), 750)))
-    .then((result: any) => {
-      res.json(result);
-    });
+  query("SELECT * FROM epics LIMIT ?, 4", [(page - 1) * 4]).then((result: any) => {
+    res.json(result);
+  });
 });
 
 app.get("/api/epics/count", function (req, res) {
-  query("SELECT COUNT(*) count FROM epics")
-    .then(result => new Promise(res => setTimeout(() => res(result), 750)))
-    .then((result: any) => {
-      res.json(result);
-    });
+  query("SELECT COUNT(*) count FROM epics").then((result: any) => {
+    res.json(result);
+  });
 });
 
 app.get("/api/epics/:id", async function (req, res) {
@@ -159,11 +149,9 @@ app.get("/api/epics/:id/milestones", async function (req, res) {
     ORDER BY id ASC
   `,
     [parseInt(req.params.id)],
-  )
-    .then(epics => new Promise(res => setTimeout(() => res(epics), 750)))
-    .then((milestones: any) => {
-      res.json(milestones);
-    });
+  ).then((milestones: any) => {
+    res.json(milestones);
+  });
 });
 
 app.listen(3001);
