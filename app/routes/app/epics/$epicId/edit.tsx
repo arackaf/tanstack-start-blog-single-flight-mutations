@@ -1,21 +1,49 @@
-import { useServerFn } from "@tanstack/start";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { createMiddleware, useServerFn } from "@tanstack/start";
+import { hashKey, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { epicQueryOptions } from "../../../../queries/epicQuery";
 import { useEffect, useRef, useState } from "react";
 import { postToApi } from "../../../../../backend/fetchUtils";
 import { createServerFn } from "@tanstack/start";
+import { epicsQueryOptions } from "../../../../queries/epicsQuery";
+
+const reactQueryMiddleware = createMiddleware().server(async ({ next, context }) => {
+  console.log("Middleware server before", { context });
+  const serverFnResult = await next({ sendContext: { xyz: 999 } });
+
+  console.log("Middleware server after", { result: serverFnResult });
+
+  // @ts-ignore
+  serverFnResult.result.message = "ayyyyyyyyyyy";
+
+  const queryOptions = epicsQueryOptions(0, 1);
+  const data = await queryOptions.queryFn();
+  console.log({ data });
+
+  // @ts-ignore
+  serverFnResult.context.qwert = "Hi";
+  serverFnResult.result.newData = data;
+
+  return serverFnResult;
+});
 
 export const saveEpic = createServerFn({ method: "POST" })
+  .middleware([reactQueryMiddleware])
   .validator((updates: { id: string; newName: string }) => updates)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    console.log("Running server function");
     await postToApi("api/epic/update", {
       id: data.id,
       name: data.newName,
     });
+    console.log("Server function finished", { context });
 
-    throw redirect({ to: "/app/epics", search: { page: 1 } });
+    return {
+      a: 12,
+    };
+
+    //throw redirect({ to: "/app/epics", search: { page: 1 } });
   });
 
 export const Route = createFileRoute("/app/epics/$epicId/edit")({
@@ -45,15 +73,21 @@ function EditEpic() {
   const save = async () => {
     setSaving(true);
 
-    await runSave({
+    const result: any = await runSave({
       data: {
         id: epic.id,
         newName: newName.current!.value,
       },
     });
 
-    queryClient.invalidateQueries({ queryKey: ["epics"] });
+    console.log({ result });
+
+    const queryOptions = epicsQueryOptions(0, 1);
+    result.newData;
+
+    queryClient.invalidateQueries({ queryKey: ["epics", "list"] });
     queryClient.invalidateQueries({ queryKey: ["epic", epicId] });
+    queryClient.setQueryData(queryOptions.queryKey, result.newData, { updatedAt: Date.now() });
   };
 
   useEffect(() => {
