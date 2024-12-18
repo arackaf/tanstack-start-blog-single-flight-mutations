@@ -4,9 +4,9 @@ import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 
 import { routeTree } from "./routeTree.gen";
 
-export function createRouter() {
-  const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
+export function createRouter() {
   const router = routerWithQueryClient(
     createTanStackRouter({
       context: { user: { id: "1", name: "Adam" }, queryClient, timestarted: +new Date() },
