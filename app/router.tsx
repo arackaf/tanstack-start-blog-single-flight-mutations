@@ -7,12 +7,14 @@ import { routeTree } from "./routeTree.gen";
 export const queryClient = new QueryClient();
 
 export function createRouter() {
+  const queryClientToUse = typeof window === "object" ? queryClient : new QueryClient();
+
   const router = routerWithQueryClient(
     createTanStackRouter({
-      context: { user: { id: "1", name: "Adam" }, queryClient, timestarted: +new Date() },
+      context: { user: { id: "1", name: "Adam" }, queryClient: queryClientToUse, timestarted: +new Date() },
       routeTree,
     }),
-    queryClient,
+    queryClientToUse,
   );
 
   return router;
