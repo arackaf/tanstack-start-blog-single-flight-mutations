@@ -10,7 +10,7 @@ import { epicsQueryOptions } from "../../../../queries/epicsQuery";
 import { queryClient } from "../../../../router";
 
 const reactQueryMiddleware = createMiddleware()
-  .client(async ({ next, context, sendContext }) => {
+  .client(async ({ next }) => {
     console.log("Client before");
 
     try {
