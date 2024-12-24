@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { postToApi } from "../../../../../backend/fetchUtils";
 import { createServerFn } from "@tanstack/start";
 import { epicsQueryOptions } from "../../../../queries/epicsQuery";
-import { queryClient } from "../../../../router";
+import { queryClient } from "../../../../queryClient";
 
 const reactQueryMiddleware = createMiddleware()
   .client(async ({ next }) => {
