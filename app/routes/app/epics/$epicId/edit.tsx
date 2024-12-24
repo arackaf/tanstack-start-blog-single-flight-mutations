@@ -16,36 +16,56 @@ const reactQueryMiddleware = createMiddleware()
     try {
       const res = await next();
       console.log("in client", "result", { res });
+
+      //console.log({ x: res.context.query.listData });
+
+      const ff = queryClient.getQueriesData({ queryKey: ["epics"] });
+      console.log({ ff });
+
+      queryClient.setQueryData(["epics", "list", 1], res.context.query.listData, { updatedAt: +new Date() });
+
+      const gg = queryClient.getQueriesData({ queryKey: ["epics"] });
+      console.log({ gg });
+
       return res;
     } catch (er) {
       console.log({ er });
       throw er;
-    } finally {
-      console.log("Client after", { context, sendContext });
     }
   })
   .server(async ({ next, context }) => {
     console.log("Middleware server before", { context });
 
-    const serverFnResult = await next({ sendContext: { xyz: 999 } });
+    try {
+      var serverFnResult = await next({ sendContext: { xyz: 999, query: {} as Record<string, any> } });
 
-    console.log("Middleware server after", { result: serverFnResult });
+      const epicsListOptions = epicsQueryOptions(0, 1);
+      const epicOptions = epicQueryOptions(0, "1");
 
-    const epicsListOptions = epicsQueryOptions(0, 1);
-    const epicOptions = epicQueryOptions(0, "1");
+      const listData = await epicsListOptions.queryFn();
+      //const epicData = await epicOptions.queryFn();
 
-    const listData = await epicsListOptions.queryFn();
-    const epicData = await epicOptions.queryFn();
+      serverFnResult.sendContext.query.listData = listData;
+      //serverFnResult.sendContext.query.epicData = epicData;
+    } catch (er) {
+      console.log("Server middleware error", er);
+      throw er;
+    }
 
-    console.log({ listData, epicData });
+    // types fine, but does not work - blows up at runtime - serverFnResult.clientAfterContext is undefined
+    // serverFnResult.clientAfterContext.query.abc = "def";
 
-    serverFnResult.clientAfterContext = { xyz: 12, www: "Hello" };
-    serverFnResult.result.query = {
-      listData,
-      epicData,
-    };
+    // works, but TS no likey
+    // serverFnResult.sendContext.query.abc = "def";
+
     return serverFnResult;
   });
+
+/*
+
+
+
+*/
 
 export const saveEpic = createServerFn({ method: "POST" })
   .middleware([reactQueryMiddleware])
@@ -59,7 +79,7 @@ export const saveEpic = createServerFn({ method: "POST" })
     });
     console.log("Server function finished", { context });
 
-    return {};
+    //return {};
     throw redirect({ to: "/app/epics", search: { page: 1 } });
   });
 
@@ -101,23 +121,15 @@ function EditEpic() {
 
     const listOptions = epicsQueryOptions(0, 1);
     const epicOptions = epicQueryOptions(0, "1");
-    //result.newData;
 
-    const a = queryClient.getQueriesData({ queryKey: ["epics"] });
-    const b = queryClient.getQueriesData({ queryKey: ["epic"] });
+    //queryClient.invalidateQueries({ queryKey: ["epics"], refetchType: "none" });
+    //queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
 
-    console.log({ a, b });
+    //queryClient.setQueryData(["epics", "list", 1], result.query.listData, { updatedAt: Date.now() });
+    //queryClient.setQueryData(["epic", "1"], result.query.epicData, { updatedAt: Date.now() });
 
-    queryClient.invalidateQueries({ queryKey: ["epics"], refetchType: "none" });
-    queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
-
-    queryClient.setQueryData(["epics", "list", 1], result.query.listData, { updatedAt: Date.now() });
-    queryClient.setQueryData(["epic", "1"], result.query.epicData, { updatedAt: Date.now() });
-
-    queryClient.refetchQueries({ queryKey: ["epics"], type: "active", stale: true });
-    queryClient.refetchQueries({ queryKey: ["epic"], type: "active", stale: true });
-
-    console.log({ key: epicOptions.queryKey, data: result.query.epicData });
+    //queryClient.refetchQueries({ queryKey: ["epics"], type: "active", stale: true });
+    //queryClient.refetchQueries({ queryKey: ["epic"], type: "active", stale: true });
 
     setSaving(false);
   };
