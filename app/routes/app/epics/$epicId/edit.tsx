@@ -1,5 +1,5 @@
 import { createMiddleware, useServerFn } from "@tanstack/start";
-import { hashKey, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery, type QueryKey } from "@tanstack/react-query";
 
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { epicQueryOptions } from "../../../../queries/epicQuery";
@@ -9,9 +9,28 @@ import { createServerFn } from "@tanstack/start";
 import { epicsQueryOptions } from "../../../../queries/epicsQuery";
 import { queryClient } from "../../../../queryClient";
 
+function getQueries(key: QueryKey) {
+  const queries = queryClient.getQueriesData({ queryKey: key });
+  const cache = queryClient.getQueryCache();
+
+  console.log({ key, queries });
+
+  queries.forEach(q => {
+    const entry = cache.find({ queryKey: q, exact: true });
+
+    console.log({ q, entry });
+  });
+
+  console.log("---------------------------");
+  return queries.map(q => q[0]);
+}
+
 const reactQueryMiddleware = createMiddleware()
   .client(async ({ next }) => {
     console.log("Client before");
+
+    getQueries(["epic"]);
+    getQueries(["epics"]);
 
     try {
       const res = await next();
@@ -115,7 +134,8 @@ function EditEpic() {
     const epicOptions = epicQueryOptions(0, "1");
 
     //queryClient.invalidateQueries({ queryKey: ["epics"], refetchType: "none" });
-    //queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
+    // queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
+    queryClient.removeQueries({ queryKey: ["epic"], refetchType: "none" });
 
     //queryClient.setQueryData(["epics", "list", 1], result.query.listData, { updatedAt: Date.now() });
     //queryClient.setQueryData(["epic", "1"], result.query.epicData, { updatedAt: Date.now() });
