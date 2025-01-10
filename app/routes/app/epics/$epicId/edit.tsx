@@ -1,5 +1,5 @@
 import { createMiddleware, useServerFn } from "@tanstack/start";
-import { useQueryClient, useSuspenseQuery, type QueryKey } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery, hashKey, type QueryKey } from "@tanstack/react-query";
 
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { epicQueryOptions } from "../../../../queries/epicQuery";
@@ -15,10 +15,13 @@ function getQueries(key: QueryKey) {
 
   console.log({ key, queries });
 
-  queries.forEach(q => {
-    const entry = cache.find({ queryKey: q, exact: true });
+  queries.forEach(([q]) => {
+    const entryX = queryClient.getQueryState(q);
 
-    console.log({ q, entry });
+    const entry = cache.find({ queryKey: q, exact: true });
+    const entry2 = cache.get(hashKey(q));
+
+    console.log({ q, entry, entry2, entryX });
   });
 
   console.log("---------------------------");
