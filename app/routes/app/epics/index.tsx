@@ -20,10 +20,8 @@ export const Route = createFileRoute("/app/epics/")({
   async loader({ context, deps }) {
     const queryClient = context.queryClient;
 
-    await Promise.allSettled([
-      queryClient.ensureQueryData(epicsQueryOptions(context.timestarted, deps.page)),
-      queryClient.ensureQueryData(epicsCountQueryOptions(context.timestarted)),
-    ]);
+    queryClient.ensureQueryData(epicsQueryOptions(context.timestarted, deps.page));
+    queryClient.ensureQueryData(epicsCountQueryOptions(context.timestarted));
   },
   component: Index,
   pendingComponent: () => <div className="p-3 text-xl">Loading epics ...</div>,
