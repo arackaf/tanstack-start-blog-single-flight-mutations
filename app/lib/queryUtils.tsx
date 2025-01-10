@@ -1,6 +1,6 @@
 import { QueryKey, useQuery, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
 
-type OtherQueryOptions = Omit<Partial<UseQueryOptions>, "queryFn" | "queryKey">;
+type OtherQueryOptions<Res> = Omit<Partial<UseQueryOptions<Res>>, "queryFn" | "queryKey">;
 
 type UseQueryLoader<T extends unknown[], Res> = {
   (...args: T): UseQueryResult<Res>;
@@ -9,7 +9,7 @@ type UseQueryLoader<T extends unknown[], Res> = {
 const createLoader = <T extends unknown[], Res>(
   runQuery: (...args: T) => Promise<Res>,
   createQueryKey: (...args: T) => QueryKey,
-  otherOptions: OtherQueryOptions = {},
+  otherOptions: OtherQueryOptions<Res> = {},
 ): UseQueryLoader<T, Res> => {
   const useData = (...args: T) => {
     return useQuery({
@@ -17,6 +17,7 @@ const createLoader = <T extends unknown[], Res>(
       queryFn: async () => {
         return runQuery(...args);
       },
+      ...otherOptions,
     });
   };
 
