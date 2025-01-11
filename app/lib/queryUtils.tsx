@@ -1,16 +1,19 @@
-import { QueryKey, useQuery, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
+import { QueryKey, useQuery, UseBaseQueryOptions, UseQueryResult, DefaultError } from "@tanstack/react-query";
 
-type OtherQueryOptions<Res> = Omit<Partial<UseQueryOptions<Res>>, "queryFn" | "queryKey">;
+type OtherQueryOptions<TQueryFnData = unknown, TError = DefaultError> = Omit<
+  Partial<UseBaseQueryOptions<TQueryFnData, TError>>,
+  "queryFn" | "queryKey"
+>;
 
-type UseQueryLoader<T extends unknown[], Res> = {
-  (...args: T): UseQueryResult<Res>;
-  load: (...args: T) => Promise<Res>;
+type UseQueryLoader<T extends unknown[], TQueryFnData = unknown, TError = DefaultError> = {
+  (...args: T): UseQueryResult<TQueryFnData, TError>;
+  load: (...args: T) => Promise<TQueryFnData>;
 };
-const createLoader = <T extends unknown[], Res>(
-  runQuery: (...args: T) => Promise<Res>,
+const createLoader = <T extends unknown[], TQueryFnData = unknown, TError = DefaultError>(
+  runQuery: (...args: T) => Promise<TQueryFnData>,
   createQueryKey: (...args: T) => QueryKey,
-  otherOptions: OtherQueryOptions<Res> = {},
-): UseQueryLoader<T, Res> => {
+  otherOptions: OtherQueryOptions<TQueryFnData, TError> = {},
+): UseQueryLoader<T, TQueryFnData, TError> => {
   const useData = (...args: T) => {
     return useQuery({
       queryKey: createQueryKey(...args),

@@ -6,7 +6,7 @@ export type Epic = {
   name: string;
 };
 
-export const epicQueryOptions = (timestarted: number, id: string | number): UseBaseQueryOptions => {
+export const epicQueryOptions = (timestarted: number, id: string | number) => {
   id = Number(id);
 
   return {

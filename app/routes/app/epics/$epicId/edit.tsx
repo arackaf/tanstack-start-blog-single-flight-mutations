@@ -112,6 +112,7 @@ export const Route = createFileRoute("/app/epics/$epicId/edit")({
 function EditEpic() {
   const { epicId } = Route.useParams();
   const { currentEpicOptions } = Route.useRouteContext();
+
   const { data: epic } = useSuspenseQuery(currentEpicOptions);
   const newName = useRef<HTMLInputElement>(null);
 
