@@ -1,3 +1,4 @@
+import { QueryOptions, UseBaseQueryOptions, UseQueryOptions } from "@tanstack/react-query";
 import { fetchJson } from "../../backend/fetchUtils";
 
 export type Epic = {
@@ -5,7 +6,7 @@ export type Epic = {
   name: string;
 };
 
-export const epicQueryOptions = (timestarted: number, id: string | number) => {
+export const epicQueryOptions = (timestarted: number, id: string | number): UseBaseQueryOptions => {
   id = Number(id);
 
   return {
@@ -19,5 +20,6 @@ export const epicQueryOptions = (timestarted: number, id: string | number) => {
     },
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 5,
+    meta: { x: 12 },
   };
 };

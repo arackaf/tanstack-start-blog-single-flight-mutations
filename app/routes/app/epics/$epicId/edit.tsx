@@ -16,12 +16,10 @@ function getQueries(key: QueryKey) {
   console.log({ key, queries });
 
   queries.forEach(([q]) => {
-    const entryX = queryClient.getQueryState(q);
-
     const entry = cache.find({ queryKey: q, exact: true });
-    const entry2 = cache.get(hashKey(q));
 
-    console.log({ q, entry, entry2, entryX });
+    console.log("Key: ", q, "Active: ", !!entry?.observers.length);
+    console.log(entry);
   });
 
   console.log("---------------------------");
@@ -36,6 +34,8 @@ const reactQueryMiddleware = createMiddleware()
     getQueries(["epics"]);
 
     try {
+      console.log("Calling next()");
+
       const res = await next();
       console.log("in client", "result", { res });
 
