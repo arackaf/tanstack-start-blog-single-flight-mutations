@@ -56,6 +56,8 @@ const reactQueryMiddleware = createMiddleware()
       const epicsListOptions = epicsQueryOptions(0, 1);
       const epicOptions = epicQueryOptions(0, "1");
 
+      // TODO
+      // @ts-ignore
       const listData = await epicsListOptions.queryFn();
       //const epicData = await epicOptions.queryFn();
 
