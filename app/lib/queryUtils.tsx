@@ -10,8 +10,8 @@ type UseQueryLoader<T extends unknown[], TQueryFnData = unknown, TError = Defaul
   load: (...args: T) => Promise<TQueryFnData>;
 };
 const createLoader = <T extends unknown[], TQueryFnData = unknown, TError = DefaultError>(
-  runQuery: (...args: T) => Promise<TQueryFnData>,
   createQueryKey: (...args: T) => QueryKey,
+  runQuery: (...args: T) => Promise<TQueryFnData>,
   otherOptions: OtherQueryOptions<TQueryFnData, TError> = {},
 ): UseQueryLoader<T, TQueryFnData, TError> => {
   const useData = (...args: T) => {
@@ -31,9 +31,9 @@ const createLoader = <T extends unknown[], TQueryFnData = unknown, TError = Defa
 
 const useTasks = createLoader(
   // args list is strongly typed in both - must be (page: number)
-  (page: number) => fetch(`/api/tasks/?page=${page}`),
   page => ["tasks", "list", page],
   // ^?
+  (page: number) => fetch(`/api/tasks/?page=${page}`),
 );
 
 const Junk = () => {
