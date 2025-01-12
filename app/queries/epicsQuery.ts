@@ -1,5 +1,6 @@
-import { queryOptions } from "@tanstack/react-query";
 import { fetchJson } from "../../backend/fetchUtils";
+import { queryOptions } from "../lib/queryOptions";
+import { queryOptions as queryOptionsTS } from "@tanstack/react-query";
 
 export type Epic = {
   id: string;

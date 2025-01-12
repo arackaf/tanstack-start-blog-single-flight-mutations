@@ -54,10 +54,9 @@ const reactQueryMiddleware = createMiddleware()
       var serverFnResult = await next({ sendContext: { xyz: 999, query: {} as Record<string, any> } });
 
       const epicsListOptions = epicsQueryOptions(0, 1);
+
       const epicOptions = epicQueryOptions(0, "1");
 
-      // TODO
-      // @ts-ignore
       const listData = await epicsListOptions.queryFn();
 
       serverFnResult.sendContext.query.listData = listData;
