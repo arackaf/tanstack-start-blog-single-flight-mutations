@@ -59,29 +59,15 @@ const reactQueryMiddleware = createMiddleware()
       // TODO
       // @ts-ignore
       const listData = await epicsListOptions.queryFn();
-      //const epicData = await epicOptions.queryFn();
 
       serverFnResult.sendContext.query.listData = listData;
-      //serverFnResult.sendContext.query.epicData = epicData;
     } catch (er) {
       console.log("Server middleware error", er);
       throw er;
     }
 
-    // types fine, but does not work - blows up at runtime - serverFnResult.clientAfterContext is undefined
-    // serverFnResult.clientAfterContext.query.abc = "def";
-
-    // works, but TS no likey
-    // serverFnResult.sendContext.query.abc = "def";
-
     return serverFnResult;
   });
-
-/*
-
-
-
-*/
 
 export const saveEpic = createServerFn({ method: "POST" })
   .middleware([reactQueryMiddleware])
@@ -93,9 +79,7 @@ export const saveEpic = createServerFn({ method: "POST" })
       id: data.id,
       name: data.newName,
     });
-    console.log("Server function finished", { context });
 
-    //return {};
     throw redirect({ to: "/app/epics", search: { page: 1 } });
   });
 
