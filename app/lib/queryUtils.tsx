@@ -16,10 +16,10 @@ type UseQueryLoader<LoaderArgs extends unknown[], TQueryFnData = unknown, TError
 const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknown, TError = DefaultError>(
   createQueryKey: (...args: LoaderArgs) => QueryKey,
   runQuery: (...args: LoaderArgs) => Promise<TQueryFnData>,
-  otherOptions: OtherQueryOptions<TQueryFnData, TError> = {},
+  otherOptions: OtherQueryOptions<TQueryFnData, TError> & { queryLabel?: string } = {},
 ): UseQueryLoader<LoaderArgs, TQueryFnData, TError> => {
   const meta = otherOptions.meta || {};
-  const queryId = currentQueryId++;
+  const queryId = otherOptions.queryLabel || currentQueryId++;
 
   loaderLookup[queryId] = runQuery;
 
