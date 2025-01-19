@@ -18,7 +18,7 @@ function getQueries(key: QueryKey) {
   queries.forEach(([q]) => {
     const entry = cache.find({ queryKey: q, exact: true });
 
-    console.log("Key: ", q, "Active: ", !!entry?.observers.length);
+    console.log("Key: ", q, "Active: ", !!entry?.observers.length, "Meta", entry?.meta);
     console.log(entry);
   });
 
