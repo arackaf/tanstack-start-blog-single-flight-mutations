@@ -1,7 +1,7 @@
 import { createMiddleware, useServerFn } from "@tanstack/start";
-import { useQueryClient, useSuspenseQuery, hashKey, type QueryKey } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery, type QueryKey } from "@tanstack/react-query";
 
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { epicQueryOptions } from "../../../../queries/epicQuery";
 import { useEffect, useRef, useState } from "react";
 import { postToApi } from "../../../../../backend/fetchUtils";
@@ -57,6 +57,7 @@ const reactQueryMiddleware = createMiddleware()
 
       const epicOptions = epicQueryOptions(0, "1");
 
+      // @ts-ignore
       const listData = await epicsListOptions.queryFn();
 
       serverFnResult.sendContext.query.listData = listData;
