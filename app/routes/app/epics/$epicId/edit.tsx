@@ -8,20 +8,20 @@ import { fetchJson, postToApi } from "../../../../../backend/fetchUtils";
 import { createServerFn } from "@tanstack/start";
 import { epicsQueryOptions } from "../../../../queries/epicsQuery";
 import { queryClient } from "../../../../queryClient";
-import { createLoader } from "../../../../lib/queryUtils";
 import { Epic } from "../../../../../types";
+import { loaderLookup } from "../../../../lib/loaderLookup";
 
 function getQueries(key: QueryKey) {
   const queries = queryClient.getQueriesData({ queryKey: key });
   const cache = queryClient.getQueryCache();
 
-  console.log({ key, queries });
+  //console.log({ key, queries });
 
   queries.forEach(([q]) => {
     const entry = cache.find({ queryKey: q, exact: true });
 
     console.log("Key: ", q, "Active: ", !!entry?.observers.length, "Meta", entry?.meta);
-    console.log(entry);
+    //console.log(entry);
   });
 
   console.log("---------------------------");
@@ -32,6 +32,7 @@ const reactQueryMiddleware = createMiddleware()
   .client(async ({ next }) => {
     console.log("Client before");
 
+    console.log({ loaderLookup });
     getQueries(["epic"]);
     getQueries(["epics"]);
 
@@ -51,6 +52,9 @@ const reactQueryMiddleware = createMiddleware()
   })
   .server(async ({ next, context }) => {
     console.log("Middleware server before", { context });
+    Object.entries(loaderLookup).forEach(([key, value]) => {
+      console.log(key, value.toString());
+    });
 
     try {
       var serverFnResult = await next({ sendContext: { xyz: 999, query: {} as Record<string, any> } });

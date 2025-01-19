@@ -1,13 +1,10 @@
 import {
   QueryKey,
-  useQuery,
   UseBaseQueryOptions,
-  UseQueryResult,
   DefaultError,
   queryOptions,
   UnusedSkipTokenOptions,
 } from "@tanstack/react-query";
-import { Task } from "../../types";
 import { loaderLookup } from "./loaderLookup";
 
 type OtherQueryOptions<TQueryFnData = unknown, TError = DefaultError> = Omit<
@@ -28,6 +25,8 @@ export const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknow
 ): UseQueryLoader<LoaderArgs, TQueryFnData, TError> => {
   const meta = otherOptions.meta || {};
   const queryId = otherOptions.queryLabel || currentQueryId++;
+
+  console.log("!!!! Creating loader", queryId);
 
   loaderLookup[queryId] = runQuery;
 
@@ -53,10 +52,3 @@ export const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknow
   // TODO: some indirection code so we can reference load function in server-side middleware via hidden uuid or whatever
   //return useData;
 };
-
-const useTasks = createLoader(
-  // args list is strongly typed in both - must be (page: number)
-  page => ["tasks", "list", page],
-  // ^?
-  (page: number) => fetch(`/api/tasks/?page=${page}`).then(async res => (await res.json()) as Task[]),
-);
