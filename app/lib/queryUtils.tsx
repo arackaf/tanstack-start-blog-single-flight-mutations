@@ -18,7 +18,6 @@ type OtherQueryOptions<TQueryFnData = unknown, TError = DefaultError> = Omit<
 let currentQueryId = 1;
 
 type UseQueryLoader<LoaderArgs extends unknown[], TQueryFnData = unknown, TError = DefaultError> = {
-  useData: (...args: LoaderArgs) => UseQueryResult<TQueryFnData, TError>;
   load: (...args: LoaderArgs) => Promise<TQueryFnData>;
   queryOptions: (...args: LoaderArgs) => UnusedSkipTokenOptions<TQueryFnData, TError>;
 };
@@ -47,23 +46,7 @@ export const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknow
     });
   };
 
-  const useData = (...args: LoaderArgs) => {
-    Object.assign(meta, {
-      __middlewareQueryInfo: { queryId, args },
-    });
-
-    return useQuery({
-      queryKey: createQueryKey(...args),
-      queryFn: async () => {
-        return runQuery(...args);
-      },
-      ...otherOptions,
-      meta,
-    });
-  };
-
   return {
-    useData,
     load: (...args: LoaderArgs) => runQuery(...args),
     queryOptions: getQueryOptions,
   };

@@ -63,7 +63,7 @@ const reactQueryMiddleware = createMiddleware()
       // @ts-ignore
       //const listData = await epicsListOptions.queryFn();
 
-      serverFnResult.sendContext.query.listData = listData;
+      //serverFnResult.sendContext.query.listData = listData;
     } catch (er) {
       console.log("Server middleware error", er);
       throw er;
@@ -90,7 +90,6 @@ export const Route = createFileRoute("/app/epics/$epicId/edit")({
   component: EditEpic,
   context({ context, params }) {
     return {
-      //currentEpicOptions: epicQueryOptions(context.timestarted, params.epicId),
       currentEpicOptions: epicLoader.queryOptions(context.timestarted, params.epicId),
     };
   },
