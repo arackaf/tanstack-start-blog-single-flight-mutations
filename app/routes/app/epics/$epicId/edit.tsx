@@ -4,10 +4,23 @@ import { useQueryClient, useSuspenseQuery, type QueryKey } from "@tanstack/react
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { epicQueryOptions } from "../../../../queries/epicQuery";
 import { useEffect, useRef, useState } from "react";
-import { postToApi } from "../../../../../backend/fetchUtils";
+import { fetchJson, postToApi } from "../../../../../backend/fetchUtils";
 import { createServerFn } from "@tanstack/start";
 import { epicsQueryOptions } from "../../../../queries/epicsQuery";
 import { queryClient } from "../../../../queryClient";
+import { createLoader } from "../../../../lib/queryUtils";
+import { Epic } from "../../../../../types";
+
+const useEpic = createLoader(
+  (_: number, epicId: string | number) => ["epic", epicId],
+  async (timestarted: number, epicId: string | number) => {
+    const timeDifference = +new Date() - timestarted;
+
+    console.log(`Loading api/epic/${epicId} data at`, timeDifference);
+    const epic = await fetchJson<Epic>(`api/epics/${epicId}`);
+    return epic;
+  },
+);
 
 function getQueries(key: QueryKey) {
   const queries = queryClient.getQueriesData({ queryKey: key });
@@ -39,7 +52,7 @@ const reactQueryMiddleware = createMiddleware()
       const res = await next();
       console.log("in client", "result", { res });
 
-      queryClient.setQueryData(["epics", "list", 1], res.context.query.listData, { updatedAt: +new Date() });
+      //queryClient.setQueryData(["epics", "list", 1], res.context.query.listData, { updatedAt: +new Date() });
 
       return res;
     } catch (er) {
@@ -53,12 +66,12 @@ const reactQueryMiddleware = createMiddleware()
     try {
       var serverFnResult = await next({ sendContext: { xyz: 999, query: {} as Record<string, any> } });
 
-      const epicsListOptions = epicsQueryOptions(0, 1);
+      //const epicsListOptions = epicsQueryOptions(0, 1);
 
-      const epicOptions = epicQueryOptions(0, "1");
+      //const epicOptions = epicQueryOptions(0, "1");
 
       // @ts-ignore
-      const listData = await epicsListOptions.queryFn();
+      //const listData = await epicsListOptions.queryFn();
 
       serverFnResult.sendContext.query.listData = listData;
     } catch (er) {
@@ -80,14 +93,14 @@ export const saveEpic = createServerFn({ method: "POST" })
       name: data.newName,
     });
 
-    throw redirect({ to: "/app/epics", search: { page: 1 } });
+    //throw redirect({ to: "/app/epics", search: { page: 1 } });
   });
 
 export const Route = createFileRoute("/app/epics/$epicId/edit")({
   component: EditEpic,
   context({ context, params }) {
     return {
-      currentEpicOptions: epicQueryOptions(context.timestarted, params.epicId),
+      currentEpicOptions: useEpic.queryOptions(context.timestarted, params.epicId),
     };
   },
   loader({ context }) {
@@ -109,6 +122,7 @@ function EditEpic() {
   const runSave = useServerFn(saveEpic);
 
   const save = async () => {
+    console.log("HELLO");
     setSaving(true);
 
     const result: any = await runSave({
@@ -120,8 +134,8 @@ function EditEpic() {
 
     console.log({ result });
 
-    const listOptions = epicsQueryOptions(0, 1);
-    const epicOptions = epicQueryOptions(0, "1");
+    //const listOptions = epicsQueryOptions(0, 1);
+    //const epicOptions = epicQueryOptions(0, "1");
 
     //queryClient.invalidateQueries({ queryKey: ["epics"], refetchType: "none" });
     // queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });

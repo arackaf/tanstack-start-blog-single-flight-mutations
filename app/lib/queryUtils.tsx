@@ -1,4 +1,12 @@
-import { QueryKey, useQuery, UseBaseQueryOptions, UseQueryResult, DefaultError } from "@tanstack/react-query";
+import {
+  QueryKey,
+  useQuery,
+  UseBaseQueryOptions,
+  UseQueryResult,
+  DefaultError,
+  queryOptions,
+  UnusedSkipTokenOptions,
+} from "@tanstack/react-query";
 import { Task } from "../../types";
 import { loaderLookup } from "./loaderLookup";
 
@@ -12,8 +20,9 @@ let currentQueryId = 1;
 type UseQueryLoader<LoaderArgs extends unknown[], TQueryFnData = unknown, TError = DefaultError> = {
   (...args: LoaderArgs): UseQueryResult<TQueryFnData, TError>;
   load: (...args: LoaderArgs) => Promise<TQueryFnData>;
+  queryOptions: (...args: LoaderArgs) => UnusedSkipTokenOptions<TQueryFnData, TError>;
 };
-const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknown, TError = DefaultError>(
+export const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknown, TError = DefaultError>(
   createQueryKey: (...args: LoaderArgs) => QueryKey,
   runQuery: (...args: LoaderArgs) => Promise<TQueryFnData>,
   otherOptions: OtherQueryOptions<TQueryFnData, TError> & { queryLabel?: string } = {},
@@ -22,6 +31,21 @@ const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknown, TErr
   const queryId = otherOptions.queryLabel || currentQueryId++;
 
   loaderLookup[queryId] = runQuery;
+
+  const getQueryOptions = (...args: LoaderArgs) => {
+    Object.assign(meta, {
+      __middlewareQueryInfo: { queryId, args },
+    });
+
+    return queryOptions({
+      queryKey: createQueryKey(...args),
+      queryFn: async () => {
+        return runQuery(...args);
+      },
+      ...otherOptions,
+      meta,
+    });
+  };
 
   const useData = (...args: LoaderArgs) => {
     Object.assign(meta, {
@@ -39,6 +63,7 @@ const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknown, TErr
   };
 
   useData.load = (...args: LoaderArgs) => runQuery(...args);
+  useData.queryOptions = getQueryOptions;
   // TODO: some indirection code so we can reference load function in server-side middleware via hidden uuid or whatever
   return useData;
 };
