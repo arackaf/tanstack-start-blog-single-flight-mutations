@@ -10,7 +10,7 @@ import { epicsQueryOptions } from "../../../../queries/epicsQuery";
 import { queryClient } from "../../../../queryClient";
 import { createLoader } from "../../../../lib/queryUtils";
 import { Epic } from "../../../../../types";
-import { useEpic } from "../../../../lib/temp";
+import { epicLoader } from "../../../../lib/temp";
 
 function getQueries(key: QueryKey) {
   const queries = queryClient.getQueriesData({ queryKey: key });
@@ -91,7 +91,7 @@ export const Route = createFileRoute("/app/epics/$epicId/edit")({
   context({ context, params }) {
     return {
       //currentEpicOptions: epicQueryOptions(context.timestarted, params.epicId),
-      currentEpicOptions: useEpic.queryOptions(context.timestarted, params.epicId),
+      currentEpicOptions: epicLoader.queryOptions(context.timestarted, params.epicId),
     };
   },
   loader({ context }) {

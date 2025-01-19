@@ -2,7 +2,7 @@ import { fetchJson } from "../../backend/fetchUtils";
 import { Epic } from "../../types";
 import { createLoader } from "./queryUtils";
 
-export const useEpic = createLoader(
+export const epicLoader = createLoader(
   (_: number, epicId: string | number) => ["epic", epicId],
   async (timestarted: number, epicId: string | number) => {
     const timeDifference = +new Date() - timestarted;

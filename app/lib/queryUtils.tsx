@@ -18,7 +18,7 @@ type OtherQueryOptions<TQueryFnData = unknown, TError = DefaultError> = Omit<
 let currentQueryId = 1;
 
 type UseQueryLoader<LoaderArgs extends unknown[], TQueryFnData = unknown, TError = DefaultError> = {
-  (...args: LoaderArgs): UseQueryResult<TQueryFnData, TError>;
+  useData: (...args: LoaderArgs) => UseQueryResult<TQueryFnData, TError>;
   load: (...args: LoaderArgs) => Promise<TQueryFnData>;
   queryOptions: (...args: LoaderArgs) => UnusedSkipTokenOptions<TQueryFnData, TError>;
 };
@@ -62,10 +62,13 @@ export const createLoader = <LoaderArgs extends unknown[], TQueryFnData = unknow
     });
   };
 
-  useData.load = (...args: LoaderArgs) => runQuery(...args);
-  useData.queryOptions = getQueryOptions;
+  return {
+    useData,
+    load: (...args: LoaderArgs) => runQuery(...args),
+    queryOptions: getQueryOptions,
+  };
   // TODO: some indirection code so we can reference load function in server-side middleware via hidden uuid or whatever
-  return useData;
+  //return useData;
 };
 
 const useTasks = createLoader(
@@ -74,14 +77,3 @@ const useTasks = createLoader(
   // ^?
   (page: number) => fetch(`/api/tasks/?page=${page}`).then(async res => (await res.json()) as Task[]),
 );
-
-const Junk = () => {
-  const { data, isLoading, error, dataUpdatedAt, isError /* etc */ } = useTasks(1);
-  //                                                                   ^?
-
-  //or do this ... in middleware >:-)
-  useTasks.load(1);
-  //        ^?
-
-  return <div />;
-};
