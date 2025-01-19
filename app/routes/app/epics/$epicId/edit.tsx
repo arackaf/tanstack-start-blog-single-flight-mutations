@@ -10,17 +10,7 @@ import { epicsQueryOptions } from "../../../../queries/epicsQuery";
 import { queryClient } from "../../../../queryClient";
 import { createLoader } from "../../../../lib/queryUtils";
 import { Epic } from "../../../../../types";
-
-const useEpic = createLoader(
-  (_: number, epicId: string | number) => ["epic", epicId],
-  async (timestarted: number, epicId: string | number) => {
-    const timeDifference = +new Date() - timestarted;
-
-    console.log(`Loading api/epic/${epicId} data at`, timeDifference);
-    const epic = await fetchJson<Epic>(`api/epics/${epicId}`);
-    return epic;
-  },
-);
+import { useEpic } from "../../../../lib/temp";
 
 function getQueries(key: QueryKey) {
   const queries = queryClient.getQueriesData({ queryKey: key });
@@ -100,6 +90,7 @@ export const Route = createFileRoute("/app/epics/$epicId/edit")({
   component: EditEpic,
   context({ context, params }) {
     return {
+      //currentEpicOptions: epicQueryOptions(context.timestarted, params.epicId),
       currentEpicOptions: useEpic.queryOptions(context.timestarted, params.epicId),
     };
   },
