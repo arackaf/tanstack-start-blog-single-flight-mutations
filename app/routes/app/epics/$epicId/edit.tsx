@@ -57,7 +57,9 @@ const reactQueryMiddleware = createMiddleware()
       const queryUpdatesPayload = res.context.queryUpdatesPayload;
       queryUpdatesPayload.forEach(packet => {
         // debugger;
-        queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
+        queryClient.invalidateQueries({ queryKey: ["epic"] });
+        // queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
+        // queryClient.removeQueries({ queryKey: ["epic"] });
         queryClient.setQueryData(packet.reactQueryKey, packet.data, { updatedAt: +new Date() });
       });
 
