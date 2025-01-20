@@ -8,11 +8,9 @@ export type Epic = {
 };
 
 export const epicLoader = createLoader(
-  (_: number, epicId: string | number) => ["epic", epicId],
-  async (timestarted: number, epicId: string | number) => {
-    const timeDifference = +new Date() - timestarted;
-
-    console.log(`Loading api/epic/${epicId} data at`, timeDifference);
+  (epicId: string | number) => ["epic", epicId],
+  async (epicId: string | number) => {
+    console.log(`Loading api/epic/${epicId} data at`, +new Date());
     const epic = await fetchJson<Epic>(`api/epics/${epicId}`);
     return epic;
   },

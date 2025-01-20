@@ -1,5 +1,5 @@
 import { createMiddleware, useServerFn } from "@tanstack/start";
-import { useQueryClient, useSuspenseQuery, type QueryKey } from "@tanstack/react-query";
+import { Query, useQueryClient, useSuspenseQuery, type QueryKey } from "@tanstack/react-query";
 
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { epicLoader, epicQueryOptions } from "../../../../queries/epicQuery";
@@ -11,21 +11,23 @@ import { queryClient } from "../../../../queryClient";
 import { Epic } from "../../../../../types";
 import { loaderLookup } from "../../../../lib/loaderLookup";
 
-function getQueries(key: QueryKey) {
+type ActiveQueryPacket = {
+  key: QueryKey;
+  entry: Query<unknown, Error, { a: 12 }>;
+};
+
+type QueryMetadataPacket = { queryId: string; args: any[] };
+
+function getActiveQueries(key: QueryKey): ActiveQueryPacket[] {
   const queries = queryClient.getQueriesData({ queryKey: key });
   const cache = queryClient.getQueryCache();
 
-  //console.log({ key, queries });
-
-  queries.forEach(([q]) => {
-    const entry = cache.find({ queryKey: q, exact: true });
-
-    console.log("Key: ", q, "Active: ", !!entry?.observers.length, "Meta", entry?.meta);
-    //console.log(entry);
-  });
-
-  console.log("---------------------------");
-  return queries.map(q => q[0]);
+  return queries
+    .map(([q]) => {
+      const entry = cache.find({ queryKey: q, exact: true });
+      return !!entry?.observers.length ? { key: q, entry } : null;
+    })
+    .filter(packet => packet) as ActiveQueryPacket[];
 }
 
 export const myServerFn = createServerFn({ method: "GET" })
@@ -40,14 +42,24 @@ const reactQueryMiddleware = createMiddleware()
   .client(async ({ next }) => {
     console.log("Client before");
 
-    // console.log({ loaderLookup });
-    getQueries(["epic"]);
-    getQueries(["epics"]);
+    const epicQueries = getActiveQueries(["epic"]);
+    const epicsQueries = getActiveQueries(["epics"]);
+
+    const queryInfoContext = epicQueries.reduce((ctx, { key, entry }) => {
+      const middlewarePacket = entry.meta?.__middlewareQueryInfo as QueryMetadataPacket | null;
+
+      if (middlewarePacket) {
+        const { queryId, args } = middlewarePacket;
+        ctx.push({ queryId, args });
+      }
+
+      return ctx;
+    }, [] as any[]);
 
     try {
       console.log("Calling next()");
 
-      const res = await next({ sendContext: { abc: 89, fnSF: myServerFn } });
+      const res = await next({ sendContext: { abc: 89, queryRevalidation: queryInfoContext } });
       console.log("in client", "result", { res });
 
       //queryClient.setQueryData(["epics", "list", 1], res.context.query.listData, { updatedAt: +new Date() });
@@ -59,7 +71,7 @@ const reactQueryMiddleware = createMiddleware()
     }
   })
   .server(async ({ next, context }) => {
-    console.log("Middleware server before", { context });
+    console.log("Middleware server before", { context, queryRevalidation: context.queryRevalidation });
     // Object.entries(loaderLookup).forEach(([key, value]) => {
     //   console.log(key, value.toString());
     // });
@@ -103,7 +115,7 @@ export const Route = createFileRoute("/app/epics/$epicId/edit")({
   component: EditEpic,
   context({ context, params }) {
     return {
-      currentEpicOptions: epicLoader.queryOptions(context.timestarted, params.epicId),
+      currentEpicOptions: epicLoader.queryOptions(params.epicId),
     };
   },
   loader({ context }) {
