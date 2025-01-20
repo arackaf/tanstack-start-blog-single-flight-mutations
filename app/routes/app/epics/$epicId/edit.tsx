@@ -28,18 +28,26 @@ function getQueries(key: QueryKey) {
   return queries.map(q => q[0]);
 }
 
+export const myServerFn = createServerFn({ method: "GET" })
+  .validator((updates: { x: number; y: number }) => updates)
+  .handler(async ({ data, context }) => {
+    await new Promise(res => setTimeout(res, 1000));
+
+    return data.x + data.y;
+  });
+
 const reactQueryMiddleware = createMiddleware()
   .client(async ({ next }) => {
     console.log("Client before");
 
-    console.log({ loaderLookup });
+    // console.log({ loaderLookup });
     getQueries(["epic"]);
     getQueries(["epics"]);
 
     try {
       console.log("Calling next()");
 
-      const res = await next();
+      const res = await next({ sendContext: { abc: 89, fnSF: myServerFn } });
       console.log("in client", "result", { res });
 
       //queryClient.setQueryData(["epics", "list", 1], res.context.query.listData, { updatedAt: +new Date() });
@@ -52,12 +60,14 @@ const reactQueryMiddleware = createMiddleware()
   })
   .server(async ({ next, context }) => {
     console.log("Middleware server before", { context });
-    Object.entries(loaderLookup).forEach(([key, value]) => {
-      console.log(key, value.toString());
-    });
+    // Object.entries(loaderLookup).forEach(([key, value]) => {
+    //   console.log(key, value.toString());
+    // });
 
     try {
-      var serverFnResult = await next({ sendContext: { xyz: 999, query: {} as Record<string, any> } });
+      var serverFnResult = await next({
+        sendContext: { xyz: 999, query: {} as Record<string, any> },
+      });
 
       //const epicsListOptions = epicsQueryOptions(0, 1);
 
@@ -79,7 +89,7 @@ export const saveEpic = createServerFn({ method: "POST" })
   .middleware([reactQueryMiddleware])
   .validator((updates: { id: string; newName: string }) => updates)
   .handler(async ({ data, context }) => {
-    console.log("Running server function");
+    console.log("\nRunning server function");
 
     await postToApi("api/epic/update", {
       id: data.id,
