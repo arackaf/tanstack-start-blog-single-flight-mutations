@@ -30,14 +30,6 @@ function getActiveQueries(key: QueryKey): ActiveQueryPacket[] {
     .filter(packet => packet) as ActiveQueryPacket[];
 }
 
-export const myServerFn = createServerFn({ method: "GET" })
-  .validator((updates: { x: number; y: number }) => updates)
-  .handler(async ({ data, context }) => {
-    await new Promise(res => setTimeout(res, 1000));
-
-    return data.x + data.y;
-  });
-
 const reactQueryMiddleware = createMiddleware()
   .client(async ({ next }) => {
     console.log("Client before");
@@ -50,7 +42,7 @@ const reactQueryMiddleware = createMiddleware()
 
       if (middlewarePacket) {
         const { queryId, args } = middlewarePacket;
-        ctx.push({ queryId, args });
+        ctx.push({ queryId, args, reactQueryKey: key });
       }
 
       return ctx;
@@ -62,7 +54,12 @@ const reactQueryMiddleware = createMiddleware()
       const res = await next({ sendContext: { abc: 89, queryRevalidation: queryInfoContext } });
       console.log("in client", "result", { res });
 
-      //queryClient.setQueryData(["epics", "list", 1], res.context.query.listData, { updatedAt: +new Date() });
+      const queryUpdatesPayload = res.context.queryUpdatesPayload;
+      queryUpdatesPayload.forEach(packet => {
+        // debugger;
+        queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
+        queryClient.setQueryData(packet.reactQueryKey, packet.data, { updatedAt: +new Date() });
+      });
 
       return res;
     } catch (er) {
@@ -81,14 +78,27 @@ const reactQueryMiddleware = createMiddleware()
         sendContext: { xyz: 999, query: {} as Record<string, any> },
       });
 
+      const queryRevalidation = context.queryRevalidation;
+      const { queryId, args, reactQueryKey } = queryRevalidation[0];
+
+      const queryFn = loaderLookup[queryId];
+      console.log({ queryFn });
+
+      const data = await queryFn(...args);
+
       //const epicsListOptions = epicsQueryOptions(0, 1);
 
       //const epicOptions = epicQueryOptions(0, "1");
 
       // @ts-ignore
       //const listData = await epicsListOptions.queryFn();
+      const queryUpdatesPayload = [] as any[];
+      queryUpdatesPayload.push({
+        reactQueryKey,
+        data,
+      });
 
-      //serverFnResult.sendContext.query.listData = listData;
+      serverFnResult.sendContext.queryUpdatesPayload = queryUpdatesPayload;
     } catch (er) {
       console.log("Server middleware error", er);
       throw er;
@@ -154,7 +164,7 @@ function EditEpic() {
 
     //queryClient.invalidateQueries({ queryKey: ["epics"], refetchType: "none" });
     // queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
-    queryClient.removeQueries({ queryKey: ["epic"], refetchType: "none" });
+    // queryClient.removeQueries({ queryKey: ["epic"], refetchType: "none" });
 
     //queryClient.setQueryData(["epics", "list", 1], result.query.listData, { updatedAt: Date.now() });
     //queryClient.setQueryData(["epic", "1"], result.query.epicData, { updatedAt: Date.now() });
