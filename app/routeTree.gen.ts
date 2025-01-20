@@ -8,8 +8,6 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
@@ -24,16 +22,11 @@ import { Route as AppEpicsIndexImport } from './routes/app/epics/index'
 import { Route as AppTasksTaskIdIndexImport } from './routes/app/tasks.$taskId.index'
 import { Route as AppEpicsEpicIdIndexImport } from './routes/app/epics/$epicId/index'
 import { Route as AppTasksTaskIdEditImport } from './routes/app/tasks_.$taskId.edit'
+import { Route as AppEpicsEpicIdEditImport } from './routes/app/epics/$epicId/edit'
 import { Route as AppEpicsEpicIdMilestonesRouteImport } from './routes/app/epics/$epicId/milestones/route'
 import { Route as AppEpicsEpicIdMilestonesIndexImport } from './routes/app/epics/$epicId/milestones/index'
 import { Route as AppEpicsEpicIdMilestonesMilestoneIdIndexImport } from './routes/app/epics/$epicId/milestones/$milestoneId.index'
 import { Route as AppEpicsEpicIdMilestonesMilestoneIdEditImport } from './routes/app/epics/$epicId/milestones_/$milestoneId.edit'
-
-// Create Virtual Routes
-
-const AppEpicsEpicIdEditLazyImport = createFileRoute(
-  '/app/epics/$epicId/edit',
-)()
 
 // Create/Update Routes
 
@@ -97,19 +90,19 @@ const AppEpicsEpicIdIndexRoute = AppEpicsEpicIdIndexImport.update({
   getParentRoute: () => AppEpicsRouteRoute,
 } as any)
 
-const AppEpicsEpicIdEditLazyRoute = AppEpicsEpicIdEditLazyImport.update({
+const AppTasksTaskIdEditRoute = AppTasksTaskIdEditImport.update({
+  id: '/tasks_/$taskId/edit',
+  path: '/tasks/$taskId/edit',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+
+const AppEpicsEpicIdEditRoute = AppEpicsEpicIdEditImport.update({
   id: '/$epicId/edit',
   path: '/$epicId/edit',
   getParentRoute: () => AppEpicsRouteRoute,
 } as any).lazy(() =>
   import('./routes/app/epics/$epicId/edit.lazy').then((d) => d.Route),
 )
-
-const AppTasksTaskIdEditRoute = AppTasksTaskIdEditImport.update({
-  id: '/tasks_/$taskId/edit',
-  path: '/tasks/$taskId/edit',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 
 const AppEpicsEpicIdMilestonesRouteRoute =
   AppEpicsEpicIdMilestonesRouteImport.update({
@@ -206,19 +199,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEpicsEpicIdMilestonesRouteImport
       parentRoute: typeof AppEpicsRouteImport
     }
+    '/app/epics/$epicId/edit': {
+      id: '/app/epics/$epicId/edit'
+      path: '/$epicId/edit'
+      fullPath: '/app/epics/$epicId/edit'
+      preLoaderRoute: typeof AppEpicsEpicIdEditImport
+      parentRoute: typeof AppEpicsRouteImport
+    }
     '/app/tasks_/$taskId/edit': {
       id: '/app/tasks_/$taskId/edit'
       path: '/tasks/$taskId/edit'
       fullPath: '/app/tasks/$taskId/edit'
       preLoaderRoute: typeof AppTasksTaskIdEditImport
       parentRoute: typeof AppRouteImport
-    }
-    '/app/epics/$epicId/edit': {
-      id: '/app/epics/$epicId/edit'
-      path: '/$epicId/edit'
-      fullPath: '/app/epics/$epicId/edit'
-      preLoaderRoute: typeof AppEpicsEpicIdEditLazyImport
-      parentRoute: typeof AppEpicsRouteImport
     }
     '/app/epics/$epicId/': {
       id: '/app/epics/$epicId/'
@@ -280,7 +273,7 @@ const AppEpicsEpicIdMilestonesRouteRouteWithChildren =
 interface AppEpicsRouteRouteChildren {
   AppEpicsIndexRoute: typeof AppEpicsIndexRoute
   AppEpicsEpicIdMilestonesRouteRoute: typeof AppEpicsEpicIdMilestonesRouteRouteWithChildren
-  AppEpicsEpicIdEditLazyRoute: typeof AppEpicsEpicIdEditLazyRoute
+  AppEpicsEpicIdEditRoute: typeof AppEpicsEpicIdEditRoute
   AppEpicsEpicIdIndexRoute: typeof AppEpicsEpicIdIndexRoute
   AppEpicsEpicIdMilestonesMilestoneIdEditRoute: typeof AppEpicsEpicIdMilestonesMilestoneIdEditRoute
 }
@@ -289,7 +282,7 @@ const AppEpicsRouteRouteChildren: AppEpicsRouteRouteChildren = {
   AppEpicsIndexRoute: AppEpicsIndexRoute,
   AppEpicsEpicIdMilestonesRouteRoute:
     AppEpicsEpicIdMilestonesRouteRouteWithChildren,
-  AppEpicsEpicIdEditLazyRoute: AppEpicsEpicIdEditLazyRoute,
+  AppEpicsEpicIdEditRoute: AppEpicsEpicIdEditRoute,
   AppEpicsEpicIdIndexRoute: AppEpicsEpicIdIndexRoute,
   AppEpicsEpicIdMilestonesMilestoneIdEditRoute:
     AppEpicsEpicIdMilestonesMilestoneIdEditRoute,
@@ -341,8 +334,8 @@ export interface FileRoutesByFullPath {
   '/app/epics/': typeof AppEpicsIndexRoute
   '/app/tasks/': typeof AppTasksIndexRoute
   '/app/epics/$epicId/milestones': typeof AppEpicsEpicIdMilestonesRouteRouteWithChildren
+  '/app/epics/$epicId/edit': typeof AppEpicsEpicIdEditRoute
   '/app/tasks/$taskId/edit': typeof AppTasksTaskIdEditRoute
-  '/app/epics/$epicId/edit': typeof AppEpicsEpicIdEditLazyRoute
   '/app/epics/$epicId': typeof AppEpicsEpicIdIndexRoute
   '/app/tasks/$taskId': typeof AppTasksTaskIdIndexRoute
   '/app/epics/$epicId/milestones/': typeof AppEpicsEpicIdMilestonesIndexRoute
@@ -356,8 +349,8 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/app/epics': typeof AppEpicsIndexRoute
   '/app/tasks': typeof AppTasksIndexRoute
+  '/app/epics/$epicId/edit': typeof AppEpicsEpicIdEditRoute
   '/app/tasks/$taskId/edit': typeof AppTasksTaskIdEditRoute
-  '/app/epics/$epicId/edit': typeof AppEpicsEpicIdEditLazyRoute
   '/app/epics/$epicId': typeof AppEpicsEpicIdIndexRoute
   '/app/tasks/$taskId': typeof AppTasksTaskIdIndexRoute
   '/app/epics/$epicId/milestones': typeof AppEpicsEpicIdMilestonesIndexRoute
@@ -376,8 +369,8 @@ export interface FileRoutesById {
   '/app/epics/': typeof AppEpicsIndexRoute
   '/app/tasks/': typeof AppTasksIndexRoute
   '/app/epics/$epicId/milestones': typeof AppEpicsEpicIdMilestonesRouteRouteWithChildren
+  '/app/epics/$epicId/edit': typeof AppEpicsEpicIdEditRoute
   '/app/tasks_/$taskId/edit': typeof AppTasksTaskIdEditRoute
-  '/app/epics/$epicId/edit': typeof AppEpicsEpicIdEditLazyRoute
   '/app/epics/$epicId/': typeof AppEpicsEpicIdIndexRoute
   '/app/tasks/$taskId/': typeof AppTasksTaskIdIndexRoute
   '/app/epics/$epicId/milestones/': typeof AppEpicsEpicIdMilestonesIndexRoute
@@ -397,8 +390,8 @@ export interface FileRouteTypes {
     | '/app/epics/'
     | '/app/tasks/'
     | '/app/epics/$epicId/milestones'
-    | '/app/tasks/$taskId/edit'
     | '/app/epics/$epicId/edit'
+    | '/app/tasks/$taskId/edit'
     | '/app/epics/$epicId'
     | '/app/tasks/$taskId'
     | '/app/epics/$epicId/milestones/'
@@ -411,8 +404,8 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/epics'
     | '/app/tasks'
-    | '/app/tasks/$taskId/edit'
     | '/app/epics/$epicId/edit'
+    | '/app/tasks/$taskId/edit'
     | '/app/epics/$epicId'
     | '/app/tasks/$taskId'
     | '/app/epics/$epicId/milestones'
@@ -429,8 +422,8 @@ export interface FileRouteTypes {
     | '/app/epics/'
     | '/app/tasks/'
     | '/app/epics/$epicId/milestones'
-    | '/app/tasks_/$taskId/edit'
     | '/app/epics/$epicId/edit'
+    | '/app/tasks_/$taskId/edit'
     | '/app/epics/$epicId/'
     | '/app/tasks/$taskId/'
     | '/app/epics/$epicId/milestones/'
@@ -520,13 +513,13 @@ export const routeTree = rootRoute
         "/app/epics/$epicId/milestones/$milestoneId/"
       ]
     },
+    "/app/epics/$epicId/edit": {
+      "filePath": "app/epics/$epicId/edit.tsx",
+      "parent": "/app/epics"
+    },
     "/app/tasks_/$taskId/edit": {
       "filePath": "app/tasks_.$taskId.edit.tsx",
       "parent": "/app"
-    },
-    "/app/epics/$epicId/edit": {
-      "filePath": "app/epics/$epicId/edit.lazy.tsx",
-      "parent": "/app/epics"
     },
     "/app/epics/$epicId/": {
       "filePath": "app/epics/$epicId/index.tsx",
