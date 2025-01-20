@@ -100,7 +100,9 @@ const AppEpicsEpicIdEditRoute = AppEpicsEpicIdEditImport.update({
   id: '/$epicId/edit',
   path: '/$epicId/edit',
   getParentRoute: () => AppEpicsRouteRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/app/epics/$epicId/edit.lazy').then((d) => d.Route),
+)
 
 const AppEpicsEpicIdMilestonesRouteRoute =
   AppEpicsEpicIdMilestonesRouteImport.update({
