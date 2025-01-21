@@ -2,13 +2,11 @@ import { createMiddleware, useServerFn } from "@tanstack/start";
 import { Query, useQueryClient, useSuspenseQuery, type QueryKey } from "@tanstack/react-query";
 
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { epicLoader, epicQueryOptions } from "../../../../queries/epicQuery";
+import { epicLoader } from "../../../../queries/epicQuery";
 import { useEffect, useRef, useState } from "react";
-import { fetchJson, postToApi } from "../../../../../backend/fetchUtils";
+import { postToApi } from "../../../../../backend/fetchUtils";
 import { createServerFn } from "@tanstack/start";
-import { epicsQueryOptions } from "../../../../queries/epicsQuery";
 import { queryClient } from "../../../../queryClient";
-import { Epic } from "../../../../../types";
 import { loaderLookup } from "../../../../lib/loaderLookup";
 
 type ActiveQueryPacket = {
@@ -90,8 +88,6 @@ const reactQueryMiddleware = createMiddleware()
 
       //const epicsListOptions = epicsQueryOptions(0, 1);
 
-      //const epicOptions = epicQueryOptions(0, "1");
-
       // @ts-ignore
       //const listData = await epicsListOptions.queryFn();
       const queryUpdatesPayload = [] as any[];
@@ -136,7 +132,6 @@ export const Route = createFileRoute("/app/epics/$epicId/edit")({
 });
 
 function EditEpic() {
-  const { epicId } = Route.useParams();
   const { currentEpicOptions } = Route.useRouteContext();
 
   const { data: epic } = useSuspenseQuery(currentEpicOptions);
@@ -162,7 +157,6 @@ function EditEpic() {
     console.log({ result });
 
     //const listOptions = epicsQueryOptions(0, 1);
-    //const epicOptions = epicQueryOptions(0, "1");
 
     //queryClient.invalidateQueries({ queryKey: ["epics"], refetchType: "none" });
     // queryClient.invalidateQueries({ queryKey: ["epic"], refetchType: "none" });
