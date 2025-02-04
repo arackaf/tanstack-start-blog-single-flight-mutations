@@ -121,7 +121,7 @@ app.get("/api/epics/:id", async function (req, res) {
   )
     .then(epics => new Promise(res => setTimeout(() => res(epics), 750)))
     .then((epics: any) => {
-      res.json(epics[0]);
+      res.json({ ...epics[0], time: Date.now() });
     });
 });
 
